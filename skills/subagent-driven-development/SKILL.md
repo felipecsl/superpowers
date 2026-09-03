@@ -5,16 +5,16 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching a fresh implementer subagent per task, a task review (spec compliance + code quality) after each, and a broad whole-branch review at the end.
+Execute plan by dispatching a fresh implementer subagent per task, then review at the cadence chosen at setup (per-task by default), and a broad whole-branch review at the end.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + task review (spec + quality) + broad final review = high quality, fast iteration
+**Core principle:** Fresh subagent per task + review at the chosen cadence + broad final review = high quality, fast iteration
 
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
 
-**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are the four named below, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are the four named below, the setup session-options question if the ledger does not already record both answers, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
 
 **Rulings, not stalls.** A running plan does not wait on a human. Conflicts,
 ambiguities, plan defects, a cap you would have asked to exceed — decide
@@ -29,6 +29,9 @@ operation; a security-sensitive action; a side effect outside this worktree
 that norms say you ask about first (a merge, a push to a shared branch, a
 publish); and a plan so broken that every path forward is a guess. For those,
 stop and ask.
+
+Before the task loop starts, one more stop: session options (review cadence
+and TDD) if this plan's ledger does not already record both.
 
 ## When to Use
 
@@ -53,10 +56,15 @@ digraph when_to_use {
 **vs. Executing Plans (parallel session):**
 - Same session (no context switch)
 - Fresh subagent per task (no context pollution)
-- Review after each task (spec compliance + code quality), broad review at the end
+- Review at the chosen cadence (per-task by default), broad review at the end
 - Faster iteration (no human-in-loop between tasks)
 
 ## The Process
+
+The diagram is the per-task cadence (default). If review cadence is
+final-only, skip the task-reviewer and fix-loop nodes: after implementer
+self-review, append completion to the ledger and go to "More tasks remain?".
+The final whole-branch review still always runs.
 
 ```dot
 digraph process {
@@ -177,9 +185,39 @@ Write the table to the ledger. Rule on everything you find before execution
 begins — each finding against the plan text that mandates it — and record
 each ruling in the ledger. If the scan is clean, proceed without comment.
 Rule on each conflict it surfaces — the spec is the binding authority, the
-plan is its argument — record the ruling beside its row, and dispatch
-Task 1. The review loop remains the net for conflicts that only emerge from
-implementation.
+plan is its argument — record the ruling beside its row. Then ask session
+options if needed, and dispatch Task 1. The review loop remains the net for
+conflicts that only emerge from implementation.
+
+### Session options (once, before Task 1)
+
+This is the one planned stop before the task loop. It is not a check-in
+between tasks. If this plan's ledger already has both lines below, reuse
+them and do not ask again.
+
+Ask your human partner, in one message:
+
+> Two choices before I execute the plan (reply with both, or say **defaults**):
+> 1. **Review cadence** — per-task review after each task (default), or only the final whole-branch review when all tasks are done?
+> 2. **TDD** — skip TDD (default), or use TDD for this session?
+
+Wait for the answer. Do not dispatch Task 1 until they answer.
+
+Record in the ledger:
+- `Review cadence: per-task` or `Review cadence: final-only`
+- `TDD: off` or `TDD: on`
+
+**defaults / go / proceed** (with no other choice) means per-task review and TDD off.
+
+**Per-task (default):** after each implementer report, generate the review
+package, dispatch the task reviewer, and run the fix loop as written below.
+
+**Final-only:** after each implementer report, skip the task reviewer and the
+per-task fix loop. Still require implementer self-review. Append completion
+to the ledger and continue. The final whole-branch review still always runs.
+
+Never skip the review required by the chosen cadence. Never skip the final
+whole-branch review.
 
 ## Model Selection
 
@@ -257,7 +295,8 @@ and fix-round diffs need it.
   first — it is your requirements, with the exact values to use verbatim";
   (3) interfaces and decisions from earlier tasks that the brief cannot
   know; (4) your resolution of any ambiguity you noticed in the brief;
-  (5) the report-file path and report contract. Exact values (numbers,
+  (5) the report-file path and report contract; (6) this session's TDD
+  choice from the ledger (`TDD: on` or `TDD: off`). Exact values (numbers,
   magic strings, signatures, test cases) appear only in the brief. Never
   make a subagent read the whole plan file.
 - **Report file:** name the implementer's report file after the brief
@@ -287,9 +326,11 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** If review cadence is final-only, skip the task reviewer: append
+completion to the ledger and continue to the next task. If review cadence
+is per-task, generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
 
-**DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
+**DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed (to review when cadence is per-task; to the next task when cadence is final-only).
 
 **NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
 
@@ -307,11 +348,12 @@ rush it into implementation.
 
 ### 3. Review the task
 
-Per-task reviews are task-scoped gates. The broad review happens once, at the
-final whole-branch review. Never skip the task review, and never accept a
-report missing either verdict — spec compliance AND task quality are both
-required. Implementer self-review never replaces the task review; both are
-needed.
+Per-task reviews are task-scoped gates. Run them when review cadence is
+per-task. The broad review happens once, at the final whole-branch review,
+for every cadence. Never skip the review required by the chosen cadence.
+When cadence is per-task, never accept a report missing either verdict —
+spec compliance AND task quality are both required. Implementer self-review
+never replaces a required task review; both are needed.
 
 - Hand the reviewer its diff as a file: run this skill's
   `scripts/review-package PLAN_FILE BASE HEAD` and pass the reviewer the file path
@@ -499,6 +541,9 @@ Use superpowers:finishing-a-development-branch.
 | "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
 | "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
 | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
+| "I'll skip asking and start Task 1 with defaults" | Session options are the one planned stop. Wait for the answer. |
+| "Final-only means skip the final review too" | The final whole-branch review always runs. |
+| "They didn't opt into TDD, so I'll apply it anyway" | Default is skip TDD. Carry `TDD: off` in every implementer dispatch. |
 
 ## Example Workflow
 
@@ -509,6 +554,9 @@ You: I'm using Subagent-Driven Development to execute this plan.
 [Read plan file once: docs/superpowers/plans/feature-plan.md]
 [Resolve workspace: scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
 [Create todos for all tasks]
+[Ask session options; wait]
+[Ledger: Review cadence: per-task]
+[Ledger: TDD: off]
 
 Task 1: Hook installation script
 
