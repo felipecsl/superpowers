@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: Use when starting to implement a feature, bugfix, refactoring, or behavior change
 ---
 
 # Test-Driven Development (TDD)
@@ -11,22 +11,39 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
 
+**Opt-in:** This skill's Iron Law applies only after your human partner opts in for this session. Default is skip TDD.
+
+## Session choice
+
+Before writing production code this session, ask once:
+
+> Use TDD for this work? Default is skip TDD. Say **yes** to opt in.
+
+- If you are following superpowers:subagent-driven-development, that skill's session-options question is this ask — do not ask a second time. If the answer is already in this session (an SDD ledger line `TDD: on` / `TDD: off`, or they already answered): do not ask again.
+- **yes / TDD / opt in:** this skill applies in full, including the Iron Law.
+- **no / skip / defaults / go / anything that is not an opt-in:** do not apply this skill. Tests the plan or task asks for are still required; tests-after is allowed. Do not delete production code for not being test-first.
+- Do not start implementation until they answer, unless an SDD ledger already recorded the choice.
+
+Wait for the answer. Do not assume yes.
+
+The rest of this skill applies only after they opt in.
+
 **Violating the letter of the rules is violating the spirit of the rules.**
 
 ## When to Use
 
-**Always:**
+**After they opt in:**
 - New features
 - Bug fixes
 - Refactoring
 - Behavior changes
 
-**Exceptions (ask your human partner):**
+**Still skip (ask your human partner) even after they opt in:**
 - Throwaway prototypes
 - Generated code
 - Configuration files
 
-Thinking "skip TDD just this once"? Stop. That's rationalization.
+Thinking "apply the Iron Law without asking"? Stop. Ask first. Default is skip.
 
 ## The Iron Law
 
@@ -227,6 +244,8 @@ When writing or changing any test, read [writing-good-tests.md](writing-good-tes
 
 ## Red Flags - STOP and Start Over
 
+These apply only after they opted in this session. If they did not opt in, tests-after is allowed.
+
 - Code before test
 - Test after implementation
 - Test passes immediately
@@ -312,9 +331,13 @@ Never fix bugs without a test.
 
 ## Final Rule
 
+After they opt in:
+
 ```
 Production code → test exists and failed first
 Otherwise → not TDD
 ```
 
 No exceptions without your human partner's permission.
+
+If they did not opt in this session, this rule does not apply.
