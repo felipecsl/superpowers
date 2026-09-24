@@ -19,16 +19,6 @@ Subagent (general-purpose):
 
     [Scene-setting: where this fits, dependencies, architectural context]
 
-    ## Session TDD
-
-    [on | off — copy from the controller's ledger]
-
-    If on: follow superpowers:test-driven-development in full, including the
-    Iron Law, and include TDD Evidence in your report.
-    If off: do not apply that Iron Law. Write the tests the task asks for;
-    tests-after is allowed. Do not delete production code for not being
-    test-first.
-
     ## Before You Begin
 
     If you have questions about:
@@ -43,7 +33,7 @@ Subagent (general-purpose):
 
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
-    2. Write tests (following TDD if Session TDD is on)
+    2. Write tests the task asks for
     3. Verify implementation works
     4. Commit your work
     5. Self-review (see below)
@@ -120,7 +110,6 @@ Subagent (general-purpose):
 
     **Testing:**
     - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if Session TDD is on?
     - Are tests comprehensive?
     - Is the test output pristine (no stray warnings or noise)?
 
@@ -140,9 +129,6 @@ Subagent (general-purpose):
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
     - What you tested and test results
-    - **TDD Evidence** (if Session TDD is on):
-      - RED: command run, relevant failing output before implementation, and why the failure was expected
-      - GREEN: command run and relevant passing output after implementation
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns

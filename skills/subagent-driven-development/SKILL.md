@@ -30,8 +30,8 @@ that norms say you ask about first (a merge, a push to a shared branch, a
 publish); and a plan so broken that every path forward is a guess. For those,
 stop and ask.
 
-Before the task loop starts, one more stop: session options (review cadence
-and TDD) if this plan's ledger does not already record both.
+Before the task loop starts, one more stop: session options (review cadence)
+if this plan's ledger does not already record it.
 
 ## When to Use
 
@@ -197,17 +197,15 @@ them and do not ask again.
 
 Ask your human partner, in one message:
 
-> Two choices before I execute the plan (reply with both, or say **defaults**):
+> One choice before I execute the plan (reply, or say **defaults**):
 > 1. **Review cadence** — per-task review after each task (default), or only the final whole-branch review when all tasks are done?
-> 2. **TDD** — skip TDD (default), or use TDD for this session?
 
 Wait for the answer. Do not dispatch Task 1 until they answer.
 
 Record in the ledger:
 - `Review cadence: per-task` or `Review cadence: final-only`
-- `TDD: off` or `TDD: on`
 
-**defaults / go / proceed** (with no other choice) means per-task review and TDD off.
+**defaults / go / proceed** (with no other choice) means per-task review.
 
 **Per-task (default):** after each implementer report, generate the review
 package, dispatch the task reviewer, and run the fix loop as written below.
@@ -295,8 +293,7 @@ and fix-round diffs need it.
   first — it is your requirements, with the exact values to use verbatim";
   (3) interfaces and decisions from earlier tasks that the brief cannot
   know; (4) your resolution of any ambiguity you noticed in the brief;
-  (5) the report-file path and report contract; (6) this session's TDD
-  choice from the ledger (`TDD: on` or `TDD: off`). Exact values (numbers,
+  (5) the report-file path and report contract. Exact values (numbers,
   magic strings, signatures, test cases) appear only in the brief. Never
   make a subagent read the whole plan file.
 - **Report file:** name the implementer's report file after the brief
@@ -543,7 +540,6 @@ Use superpowers:finishing-a-development-branch.
 | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
 | "I'll skip asking and start Task 1 with defaults" | Session options are the one planned stop. Wait for the answer. |
 | "Final-only means skip the final review too" | The final whole-branch review always runs. |
-| "They didn't opt into TDD, so I'll apply it anyway" | Default is skip TDD. Carry `TDD: off` in every implementer dispatch. |
 
 ## Example Workflow
 
@@ -556,7 +552,6 @@ You: I'm using Subagent-Driven Development to execute this plan.
 [Create todos for all tasks]
 [Ask session options; wait]
 [Ledger: Review cadence: per-task]
-[Ledger: TDD: off]
 
 Task 1: Hook installation script
 
